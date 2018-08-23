@@ -23,14 +23,19 @@ import org.json.JSONObject;
  */
 public class SkuDetails {
     String mItemType;
-    String mSku;
-    String mType;
-    Double mPriceAsDecimal;
-    String mPrice;
-    String mPriceCurrency;
+    String mJson;
     String mTitle;
     String mDescription;
-    String mJson;
+    String mSku;
+    String mType;
+    String mPriceCurrency;
+    Double mPriceAsDecimal;
+    String mPrice;
+    String mSubscriptionPeriod;
+    Double mIntroductoryPriceAsDecimal;
+    String mIntroductoryPrice;
+    String mIntroductoryPriceCycles;
+    String mIntroductoryPricePeriod;
 
     public SkuDetails(String jsonSkuDetails) throws JSONException {
         this(IabHelper.ITEM_TYPE_INAPP, jsonSkuDetails);
@@ -41,10 +46,17 @@ public class SkuDetails {
         mJson = jsonSkuDetails;
         JSONObject o = new JSONObject(mJson);
         mSku = o.optString("productId");
-        mType = o.optString("type");
-        mPrice = o.optString("price");
+        mType = o.optString("type");  
         mPriceCurrency = o.optString("price_currency_code");
+        mPrice = o.optString("price");
         mPriceAsDecimal = Double.parseDouble(o.optString("price_amount_micros"))/Double.valueOf(1000000);
+        if(getIsSubscription()) {
+            mSubscriptionPeriod = o.optString("subscriptionPeriod");
+            mIntroductoryPricePeriod = o.optString("introductoryPricePeriod");
+            mIntroductoryPriceCycles = o.optString("introductoryPriceCycles");
+            mIntroductoryPrice = o.optString("introductoryPrice");
+            mIntroductoryPriceAsDecimal = Double.parseDouble(o.optString("introductoryPriceAmountMicros"))/Double.valueOf(1000000);
+        }
         mTitle = o.optString("title");
         mDescription = o.optString("description");
     }
@@ -56,9 +68,19 @@ public class SkuDetails {
     public Double getPriceAsDecimal() { return mPriceAsDecimal; }
     public String getTitle() { return mTitle; }
     public String getDescription() { return mDescription; }
+    public Boolean getIsSubscription() { return mType.contentEquals("subs"); }
+    public Double getIntroductoryPriceAsDecimal() { return mIntroductoryPriceAsDecimal; }
+    public String getIntroductoryPrice() { return mIntroductoryPrice; }
+    public String getIntroductoryPriceCycles() { return mIntroductoryPriceCycles; }
+    public String getIntroductoryPricePeriod() { return mIntroductoryPricePeriod; }
+    public String getSubscriptionPeriod() { return mSubscriptionPeriod; }
 
     @Override
     public String toString() {
         return "SkuDetails:" + mJson;
+    }
+
+    public JSONObject toJson() throws JSONException {
+        return new JSONObject(mJson);
     }
 }
