@@ -23,7 +23,7 @@ import org.json.JSONObject;
  */
 public class SkuDetails {
     String mItemType;
-    String mJson;
+    JSONObject mJsonParsed;
     String mTitle;
     String mDescription;
     String mSku;
@@ -43,22 +43,23 @@ public class SkuDetails {
 
     public SkuDetails(String itemType, String jsonSkuDetails) throws JSONException {
         mItemType = itemType;
-        mJson = jsonSkuDetails;
-        JSONObject o = new JSONObject(mJson);
-        mSku = o.optString("productId");
-        mType = o.optString("type");  
-        mPriceCurrency = o.optString("price_currency_code");
-        mPrice = o.optString("price");
-        mPriceAsDecimal = Double.parseDouble(o.optString("price_amount_micros"))/Double.valueOf(1000000);
+        mJsonParsed = new JSONObject(jsonSkuDetails);
+        mSku = mJsonParsed.optString("productId");
+        mType = mJsonParsed.optString("type");  
+        mPriceCurrency = mJsonParsed.optString("price_currency_code");
+        mPrice = mJsonParsed.optString("price");
+        mPriceAsDecimal = Double.parseDouble(mJsonParsed.optString("price_amount_micros"))/Double.valueOf(1000000);
         if(getIsSubscription()) {
-            mSubscriptionPeriod = o.optString("subscriptionPeriod");
-            mIntroductoryPricePeriod = o.optString("introductoryPricePeriod");
-            mIntroductoryPriceCycles = o.optString("introductoryPriceCycles");
-            mIntroductoryPrice = o.optString("introductoryPrice");
-            mIntroductoryPriceAsDecimal = Double.parseDouble(o.optString("introductoryPriceAmountMicros"))/Double.valueOf(1000000);
+            mSubscriptionPeriod = mJsonParsed.optString("subscriptionPeriod");
         }
-        mTitle = o.optString("title");
-        mDescription = o.optString("description");
+        if(mJsonParsed.has("introductoryPrice")) {
+            mIntroductoryPricePeriod = mJsonParsed.optString("introductoryPricePeriod");
+            mIntroductoryPriceCycles = mJsonParsed.optString("introductoryPriceCycles");
+            mIntroductoryPrice = mJsonParsed.optString("introductoryPrice");
+            mIntroductoryPriceAsDecimal = Double.parseDouble(mJsonParsed.optString("introductoryPriceAmountMicros"))/Double.valueOf(1000000);
+        }
+        mTitle = mJsonParsed.optString("title");
+        mDescription = mJsonParsed.optString("description");
     }
 
     public String getSku() { return mSku; }
@@ -69,6 +70,7 @@ public class SkuDetails {
     public String getTitle() { return mTitle; }
     public String getDescription() { return mDescription; }
     public Boolean getIsSubscription() { return mType.contentEquals("subs"); }
+    public Boolean getHasIntroductoryPrice() { return mJsonParsed.has("introductoryPrice"); }
     public Double getIntroductoryPriceAsDecimal() { return mIntroductoryPriceAsDecimal; }
     public String getIntroductoryPrice() { return mIntroductoryPrice; }
     public String getIntroductoryPriceCycles() { return mIntroductoryPriceCycles; }
@@ -77,10 +79,10 @@ public class SkuDetails {
 
     @Override
     public String toString() {
-        return "SkuDetails:" + mJson;
+        return "SkuDetails:" + mJsonParsed.toString();
     }
 
-    public JSONObject toJson() throws JSONException {
-        return new JSONObject(mJson);
+    public JSONObject toJson() {
+        return mJsonParsed;
     }
 }

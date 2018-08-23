@@ -342,9 +342,11 @@ public class InAppBillingV3 extends CordovaPlugin {
               detailsJson.put("currency", skuDetails.getPriceCurrency());
               detailsJson.put("isSubscription", skuDetails.getIsSubscription());
               if(skuDetails.getIsSubscription()) {
+                detailsJson.put("subscriptionPeriod", skuDetails.getSubscriptionPeriod());
+              }
+              if(skuDetails.getHasIntroductoryPrice()) {
                 detailsJson.put("introductoryPriceAsDecimal", skuDetails.getIntroductoryPriceAsDecimal());
                 detailsJson.put("introductoryPrice", skuDetails.getIntroductoryPrice());
-                detailsJson.put("subscriptionPeriod", skuDetails.getSubscriptionPeriod());
                 detailsJson.put("introductoryPricePeriod", skuDetails.getIntroductoryPricePeriod());
                 detailsJson.put("introductoryPriceCycles", skuDetails.getIntroductoryPriceCycles());
               }
