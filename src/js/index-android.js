@@ -23,7 +23,7 @@ const nativeCall = (name, args = []) => {
         resolve(res);
       },
       createIapError(reject),
-      "InAppBillingV3",
+      'InAppBillingV3',
       name,
       args
     );
@@ -34,7 +34,7 @@ const chunkedGetSkuDetails = productIds => {
   // We need to chunk the getSkuDetails call cause it is only allowed to provide a maximum of 20 items per call
   return utils.chunk(productIds, 19).reduce((promise, productIds) => {
     return promise.then(result => {
-      return nativeCall("getSkuDetails", productIds).then(items =>
+      return nativeCall('getSkuDetails', productIds).then(items =>
         result.concat(items)
       );
     });
@@ -42,30 +42,13 @@ const chunkedGetSkuDetails = productIds => {
 };
 
 inAppPurchase.getProducts = productIds => {
-  return new Promise((resolve, reject) => {
-    if (!inAppPurchase.utils.validArrayOfStrings(productIds)) {
-      reject(new Error(inAppPurchase.utils.errors[101]));
-    } else {
-      nativeCall("init", [])
-        .then(() => {
-          return chunkedGetSkuDetails(productIds);
-        })
-        .then(items => {
-          const arr = items.map(val => {
-            return {
-              productId: val.productId,
-              title: val.title,
-              description: val.description,
-              price: val.price,
-              currency: val.currency,
-              priceAsDecimal: val.priceAsDecimal
-            };
-          });
-          resolve(arr);
-        })
-        .catch(reject);
-    }
-  });
+  if (!inAppPurchase.utils.validArrayOfStrings(productIds)) {
+    return Promise.reject(new Error(inAppPurchase.utils.errors[101]));
+  } else {
+    return nativeCall('init', []).then(() => {
+      return chunkedGetSkuDetails(productIds);
+    });
+  }
 };
 
 const executePaymentOfType = (type, productId) => {
@@ -90,11 +73,11 @@ const executePaymentOfType = (type, productId) => {
 };
 
 inAppPurchase.buy = productId => {
-  return executePaymentOfType("buy", productId);
+  return executePaymentOfType('buy', productId);
 };
 
 inAppPurchase.subscribe = productId => {
-  return executePaymentOfType("subscribe", productId);
+  return executePaymentOfType('subscribe', productId);
 };
 
 inAppPurchase.consume = (type, receipt, signature) => {
@@ -106,7 +89,7 @@ inAppPurchase.consume = (type, receipt, signature) => {
     } else if (!inAppPurchase.utils.validString(signature)) {
       reject(new Error(inAppPurchase.utils.errors[105]));
     } else {
-      nativeCall("consumePurchase", [type, receipt, signature])
+      nativeCall('consumePurchase', [type, receipt, signature])
         .then(resolve)
         .catch(reject);
     }
@@ -114,15 +97,15 @@ inAppPurchase.consume = (type, receipt, signature) => {
 };
 
 inAppPurchase.restorePurchases = () => {
-  return nativeCall("init", [])
+  return nativeCall('init', [])
     .then(() => {
-      return nativeCall("restorePurchases", []);
+      return nativeCall('restorePurchases', []);
     })
     .then(purchases => Promise.resolve([].concat(purchases)));
 };
 
 inAppPurchase.getReceipt = () => {
-  return Promise.resolve("");
+  return Promise.resolve('');
 };
 
 module.exports = inAppPurchase;

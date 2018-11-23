@@ -81,7 +81,7 @@ utils.chunk = function (array, size) {
     return result.concat([array.slice(i * size, (i + 1) * size)]);
   }, []);
 };
-"use strict";
+'use strict';
 
 /*!
  *
@@ -109,7 +109,7 @@ var nativeCall = function nativeCall(name) {
   return new Promise(function (resolve, reject) {
     window.cordova.exec(function (res) {
       resolve(res);
-    }, createIapError(reject), "InAppBillingV3", name, args);
+    }, createIapError(reject), 'InAppBillingV3', name, args);
   });
 };
 
@@ -117,7 +117,7 @@ var chunkedGetSkuDetails = function chunkedGetSkuDetails(productIds) {
   // We need to chunk the getSkuDetails call cause it is only allowed to provide a maximum of 20 items per call
   return utils.chunk(productIds, 19).reduce(function (promise, productIds) {
     return promise.then(function (result) {
-      return nativeCall("getSkuDetails", productIds).then(function (items) {
+      return nativeCall('getSkuDetails', productIds).then(function (items) {
         return result.concat(items);
       });
     });
@@ -125,27 +125,13 @@ var chunkedGetSkuDetails = function chunkedGetSkuDetails(productIds) {
 };
 
 inAppPurchase.getProducts = function (productIds) {
-  return new Promise(function (resolve, reject) {
-    if (!inAppPurchase.utils.validArrayOfStrings(productIds)) {
-      reject(new Error(inAppPurchase.utils.errors[101]));
-    } else {
-      nativeCall("init", []).then(function () {
-        return chunkedGetSkuDetails(productIds);
-      }).then(function (items) {
-        var arr = items.map(function (val) {
-          return {
-            productId: val.productId,
-            title: val.title,
-            description: val.description,
-            price: val.price,
-            currency: val.currency,
-            priceAsDecimal: val.priceAsDecimal
-          };
-        });
-        resolve(arr);
-      }).catch(reject);
-    }
-  });
+  if (!inAppPurchase.utils.validArrayOfStrings(productIds)) {
+    return Promise.reject(new Error(inAppPurchase.utils.errors[101]));
+  } else {
+    return nativeCall('init', []).then(function () {
+      return chunkedGetSkuDetails(productIds);
+    });
+  }
 };
 
 var executePaymentOfType = function executePaymentOfType(type, productId) {
@@ -168,11 +154,11 @@ var executePaymentOfType = function executePaymentOfType(type, productId) {
 };
 
 inAppPurchase.buy = function (productId) {
-  return executePaymentOfType("buy", productId);
+  return executePaymentOfType('buy', productId);
 };
 
 inAppPurchase.subscribe = function (productId) {
-  return executePaymentOfType("subscribe", productId);
+  return executePaymentOfType('subscribe', productId);
 };
 
 inAppPurchase.consume = function (type, receipt, signature) {
@@ -184,21 +170,21 @@ inAppPurchase.consume = function (type, receipt, signature) {
     } else if (!inAppPurchase.utils.validString(signature)) {
       reject(new Error(inAppPurchase.utils.errors[105]));
     } else {
-      nativeCall("consumePurchase", [type, receipt, signature]).then(resolve).catch(reject);
+      nativeCall('consumePurchase', [type, receipt, signature]).then(resolve).catch(reject);
     }
   });
 };
 
 inAppPurchase.restorePurchases = function () {
-  return nativeCall("init", []).then(function () {
-    return nativeCall("restorePurchases", []);
+  return nativeCall('init', []).then(function () {
+    return nativeCall('restorePurchases', []);
   }).then(function (purchases) {
     return Promise.resolve([].concat(purchases));
   });
 };
 
 inAppPurchase.getReceipt = function () {
-  return Promise.resolve("");
+  return Promise.resolve('');
 };
 
 module.exports = inAppPurchase;
