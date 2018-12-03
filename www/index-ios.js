@@ -77,17 +77,7 @@ inAppPurchase.getProducts = function (productIds) {
         if (!res || !res.products) {
           resolve([]);
         } else {
-          var arr = res.products.map(function (val) {
-            return {
-              productId: val.productId,
-              title: val.title,
-              description: val.description,
-              priceAsDecimal: val.priceAsDecimal,
-              price: val.price,
-              currency: val.currency
-            };
-          });
-          resolve(arr);
+          resolve(res.products);
         }
       }).catch(reject);
     }

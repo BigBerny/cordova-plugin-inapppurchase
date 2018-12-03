@@ -35,17 +35,7 @@ inAppPurchase.getProducts = productIds => {
           if (!res || !res.products) {
             resolve([]);
           } else {
-            const arr = res.products.map(val => {
-              return {
-                productId: val.productId,
-                title: val.title,
-                description: val.description,
-                priceAsDecimal: val.priceAsDecimal,
-                price: val.price,
-                currency: val.currency
-              };
-            });
-            resolve(arr);
+            resolve(res.products);
           }
         })
         .catch(reject);
