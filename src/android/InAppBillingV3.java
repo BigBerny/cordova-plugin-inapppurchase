@@ -66,7 +66,7 @@ public class InAppBillingV3 extends CordovaPlugin {
     Context context = this.cordova.getActivity();
     InputStream is;
     try {
-      is = context.getAssets().open("www/manifest.json");
+      is = context.getAssets().open("public/manifest.json");
       Scanner s = new Scanner(is).useDelimiter("\\A");
       String manifestString = s.hasNext() ? s.next() : "";
       Log.d(TAG, "manifest:" + manifestString);
